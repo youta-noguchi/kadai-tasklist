@@ -15,11 +15,26 @@ class TasksController extends Controller
      */
     public function index()
     {
+        /*
         $tasks = Task::all();
         
         return view('tasks.index', [
             'tasks' => $tasks,
         ]);
+        */
+        $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            
+            $tasks = $user->tasks()->orderBy('created_at')->paginate(10);
+            
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+        }
+        
+        return view('welcome', $data);
     }
 
     /**
@@ -44,15 +59,23 @@ class TasksController extends Controller
      */
     public function store(Request $request)
     {
+        // バリデーション
         $request->validate([
             'status' => 'required|max:10',
             'content' => 'required|max:255',
         ]);
         
+        // 認証済みユーザ（閲覧者)の投稿として作成(リクエストされた値をもとに作成)
+        $request->user()->tasks()->create([
+            'content' => $request->content,
+            'status' => $request->status,
+        ]);
+        /*
         $task = new Task;
         $task->status = $request->status;
         $task->content = $request->content;
         $task->save();
+        */
         
         return redirect('/');
     }
@@ -118,7 +141,10 @@ class TasksController extends Controller
     public function destroy($id)
     {
         $task = Task::findOrFail($id);
-        $task->delete();
+        
+        if (\Auth::id() === $task->user_id) {
+            $task->delete();
+        }
         
         return redirect('/');
     }
