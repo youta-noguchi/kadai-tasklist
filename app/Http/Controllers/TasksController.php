@@ -13,6 +13,8 @@ class TasksController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+     
+    // getでtasks/にアクセスされた場合の一覧表示
     public function index()
     {
         /*
@@ -42,10 +44,13 @@ class TasksController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+     
+    // getでtasks/create/にアクセスされた場合の新規登録画面表示
     public function create()
     {
         $task = new Task;
         
+        // タスク作成ビューを表示
         return view('tasks.create', [
             'task' => $task,
         ]);
@@ -57,6 +62,8 @@ class TasksController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+     
+    // postでtasks/にアクセスされた場合の新規登録処理
     public function store(Request $request)
     {
         // バリデーション
@@ -77,6 +84,7 @@ class TasksController extends Controller
         $task->save();
         */
         
+        // トップページへリダイレクト
         return redirect('/');
     }
 
@@ -86,10 +94,14 @@ class TasksController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+     
+    // getでtasks/任意のidにアクセスされた場合の取得表示
     public function show($id)
     {
+        // idの値でタスクを検索して取得
         $task = Task::findOrFail($id);
         
+        // タスク詳細ビューでそれを表示
         return view('tasks.show', [
             'task' => $task,
         ]);
@@ -101,10 +113,14 @@ class TasksController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+     
+    // getでtasks/任意のidにアクセスされた場合の更新画面表示
     public function edit($id)
     {
+        // idの値でタスクを検索して取得
         $task = Task::findOrFail($id);
         
+        // タスク編集ビューでそれを表示
         return view('tasks.edit', [
             'task' => $task,
         ]);
@@ -117,6 +133,8 @@ class TasksController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+     
+    // put or patchでtasks/任意のidにアクセスされた場合の更新処理
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -129,6 +147,7 @@ class TasksController extends Controller
         $task->content = $request->content;
         $task->save();
         
+        //　トップページへリダイレクト
         return redirect('/');
     }
 
@@ -138,14 +157,18 @@ class TasksController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+     
+    // deleteでtasks/任意のidにアクセスされた場合の削除処理
     public function destroy($id)
     {
-        $task = Task::findOrFail($id);
+        // idの値でタスクを取得
+        $task = \App\Task::findOrFail($id);
         
         if (\Auth::id() === $task->user_id) {
             $task->delete();
         }
         
+        // トップページへリダイレクト
         return redirect('/');
     }
 }
